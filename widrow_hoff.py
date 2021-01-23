@@ -11,6 +11,7 @@ import numpy as np
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 
+
 class Widrow_Hoff:
     def __init__(self, x, y, label, a, b, lr):
         self.x = np.array(x)
@@ -62,7 +63,6 @@ if __name__ == "__main__":
 
     # x = [[0.0, 2.0], [1.0, 2.0], [2.0, 1.0], [-3.0, 1.0], [-2.0, -1.0], [-3.0, -2.0]]
     # y = [1, 1, 1, -1, -1, -1]
-    # label contains the g(x) 
     # label = [1] 
     # a = [1.0, 0.0, 0.0]
     # b = [1.0, 0.5, 1.5, 2.5, 1.5, 1.0]
@@ -81,6 +81,7 @@ if __name__ == "__main__":
     model.train(epoch=2)
     model.compute_percentage()
 
+    ## KNN
     # neigh = KNeighborsClassifier(n_neighbors=1)
     # neigh.fit(x, y)
     # print(neigh.predict([[7.2, 3.5, 4.0, 2.4],
