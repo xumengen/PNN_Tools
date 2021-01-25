@@ -8,12 +8,14 @@
 '''
 
 import numpy as np
+from base import ModelBase
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 
 
-class Widrow_Hoff:
+class Widrow_Hoff(ModelBase):
     def __init__(self, x, y, label, a, b, lr):
+        super(Widrow_Hoff, self).__init__()
         self.x = np.array(x)
         self.y = np.array(y)
         self.label = label
@@ -31,15 +33,15 @@ class Widrow_Hoff:
                 g_value = np.dot(self.a, input_x)
                 print("parameter g of {}-th iteration is {}\n".format(i*len(self.x)+j+1, g_value))
                 if g_value != self.b[j]:
-                    self.a = self.__update(j, g_value, input_x)
+                    self.a = self.update(j, g_value, input_x)
                 print("parameter a of {}-th iteration is {}\n".format(i*len(self.x)+j+1, self.a))
         # print("parameter a of {}-th iteration is {}\n".format(i*len(self.x)+j+1, self.a))
 
-    def __update(self, j, g_value, input_x):
+    def update(self, j, g_value, input_x):
         a_new = self.a + self.lr * (self.b[j] - g_value) * np.transpose(input_x)
         return a_new
 
-    def compute_percentage(self):
+    def test(self):
         count = 0
         for i in range(len(self.x)):
             input_x = np.transpose(np.insert(self.x[i], 0, 1))
@@ -77,9 +79,9 @@ if __name__ == "__main__":
     lr = 0.01
 
     model = Widrow_Hoff(x=x, y=y, label=label, a=a, b=b, lr=lr)
-    model.compute_percentage()
+    model.test()
     model.train(epoch=2)
-    model.compute_percentage()
+    model.test()
 
     ## KNN
     # neigh = KNeighborsClassifier(n_neighbors=1)
