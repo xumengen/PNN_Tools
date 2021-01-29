@@ -14,11 +14,10 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 class Widrow_Hoff(ModelBase):
-    def __init__(self, x, y, label, a, b, lr):
+    def __init__(self, x, y, a, b, lr):
         super(Widrow_Hoff, self).__init__()
         self.x = np.array(x)
         self.y = np.array(y)
-        self.label = label
         self.a = np.array(a)
         self.b = np.array(b)
         self.lr = lr
@@ -26,7 +25,7 @@ class Widrow_Hoff(ModelBase):
     def train(self, epoch):
         for i in range(epoch):
             for j in range(len(self.x)):
-                if self.y[j] in self.label:
+                if self.y[j] == 1:
                     input_x = np.transpose(np.insert(self.x[j], 0, 1))
                 else:
                     input_x = np.transpose(np.insert(-self.x[j], 0, -1))
@@ -46,14 +45,21 @@ class Widrow_Hoff(ModelBase):
         for i in range(len(self.x)):
             input_x = np.transpose(np.insert(self.x[i], 0, 1))
             g_value = np.dot(self.a, input_x)
-            if g_value > 0:
-                if self.y[i] == 0:
-                    count += 1
-            else:
-                if self.y[i] == 1 or self.y[i] == 2:
-                    count += 1
+            if g_value >= 0 and self.y[i] == 1:
+                count += 1
+            elif g_value < 0 and self.y[i] == -1:
+                count += 1
         print("the percentage is {}\n".format(count/len(self.x)))
 
+
+def change_label(input):
+    res = list()
+    for idx, label in enumerate(input):
+        if label == 0:
+            res.append(1)
+        else:
+            res.append(-1)
+    return res
 
 
 if __name__ == "__main__":
@@ -65,7 +71,6 @@ if __name__ == "__main__":
 
     # x = [[0.0, 2.0], [1.0, 2.0], [2.0, 1.0], [-3.0, 1.0], [-2.0, -1.0], [-3.0, -2.0]]
     # y = [1, 1, 1, -1, -1, -1]
-    # label = [1] 
     # a = [1.0, 0.0, 0.0]
     # b = [1.0, 0.5, 1.5, 2.5, 1.5, 1.0]
     # lr = 0.1
@@ -73,12 +78,12 @@ if __name__ == "__main__":
     iris = datasets.load_iris()
     x = iris.data
     y = iris.target
-    label = [0]
+    y = change_label(y)
     a = [0.5, -1.5, 1.5, 2.5, -2.5]
     b = [1 for _ in range(len(x))]
     lr = 0.01
 
-    model = Widrow_Hoff(x=x, y=y, label=label, a=a, b=b, lr=lr)
+    model = Widrow_Hoff(x=x, y=y, a=a, b=b, lr=lr)
     model.test()
     model.train(epoch=2)
     model.test()
