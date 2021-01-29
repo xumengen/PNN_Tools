@@ -10,16 +10,19 @@
 import numpy as np
 from base import ModelBase
 from sklearn import datasets
+from collections import defaultdict
+from tabulate import tabulate
 
 
 class Delta_Learning(ModelBase):
     def __init__(self, x, y, w, lr):
         self.x = np.array(x)
         self.y = np.array(y)
-        self.w = w
+        self.w = np.array(w)
         self.lr = lr
 
-    def train(self, epoch):
+    def train(self, epoch, log=False):
+        result = defaultdict(list)
         for i in range(epoch):
             for j in range(len(self.x)):
                 input_x = np.transpose(np.insert(self.x[j], 0, 1))
@@ -30,9 +33,12 @@ class Delta_Learning(ModelBase):
                     output = 0
                 else:
                     output = 0.5
-                print("parameter output of {}-th iteration is {}\n".format(i*len(self.x)+j+1, output))
                 self.update(output, j, input_x)
-                print("parameter a of {}-th iteration is {}\n".format(i*len(self.x)+j+1, self.w))
+                if log:
+                    result["pred_value"].append(output)
+                    result["parameter"].append(self.w[:])
+        if log:
+            print(tabulate(result, headers='keys', showindex='always', tablefmt='pretty'))
       
     def update(self, output, j, input_x):
         self.w = self.w + self.lr * (self.y[j] - output) * input_x
@@ -50,7 +56,7 @@ class Delta_Learning(ModelBase):
                 output = 0.5
             if output == self.y[i]:
                 count += 1
-        print("the percentage is {}\n".format(count/len(self.x)))
+        print("the percentage is {}%\n".format(count/len(self.x)*100))
 
 
 def change_label(input):
@@ -78,11 +84,11 @@ if __name__ == "__main__":
     x = iris.data
     y = iris.target
     y = change_label(y)
-    # w = [-0.5, 3.5, -2.5, -2.5, 0.5]
-    w = [0.5, 2.5, -0.5, -3.5, 3.5]
+    w = [-0.5, 3.5, -2.5, -2.5, 0.5]
+    # w = [0.5, 2.5, -0.5, -3.5, 3.5]
     lr = 0.10
 
     model = Delta_Learning(x=x, y=y, w=w, lr=lr)
     model.test()
-    model.train(epoch=2)
+    model.train(epoch=2, log=True)
     model.test()
