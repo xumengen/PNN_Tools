@@ -11,6 +11,8 @@ import numpy as np
 from base import ModelBase
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
+from collections import defaultdict
+from tabulate import tabulate
 
 
 class Widrow_Hoff(ModelBase):
@@ -22,7 +24,8 @@ class Widrow_Hoff(ModelBase):
         self.b = np.array(b)
         self.lr = lr
 
-    def train(self, epoch):
+    def train(self, epoch, log=False):
+        result = defaultdict(list)
         for i in range(epoch):
             for j in range(len(self.x)):
                 if self.y[j] == 1:
@@ -30,11 +33,13 @@ class Widrow_Hoff(ModelBase):
                 else:
                     input_x = np.transpose(np.insert(-self.x[j], 0, -1))
                 g_value = np.dot(self.a, input_x)
-                print("parameter g of {}-th iteration is {}\n".format(i*len(self.x)+j+1, g_value))
                 if g_value != self.b[j]:
                     self.a = self.update(j, g_value, input_x)
-                print("parameter a of {}-th iteration is {}\n".format(i*len(self.x)+j+1, self.a))
-        # print("parameter a of {}-th iteration is {}\n".format(i*len(self.x)+j+1, self.a))
+                if log:
+                    result["pred_value"].append(g_value)
+                    result["parameter"].append(self.a[:])
+        if log:
+            print(tabulate(result, headers='keys', showindex='always', tablefmt='pretty'))
 
     def update(self, j, g_value, input_x):
         a_new = self.a + self.lr * (self.b[j] - g_value) * np.transpose(input_x)
@@ -79,13 +84,13 @@ if __name__ == "__main__":
     x = iris.data
     y = iris.target
     y = change_label(y)
-    a = [0.5, -1.5, 1.5, 2.5, -2.5]
+    a = [0.5, -1.5, 2.5, -0.5, -2.5]
     b = [1 for _ in range(len(x))]
     lr = 0.01
 
     model = Widrow_Hoff(x=x, y=y, a=a, b=b, lr=lr)
     model.test()
-    model.train(epoch=2)
+    model.train(epoch=2, log=False)
     model.test()
 
     ## KNN
