@@ -1,4 +1,6 @@
 import numpy as np
+import torch
+from torch.nn import ReLU, LeakyReLU, Tanh, AvgPool2d, MaxPool2d
 import math
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
@@ -6,7 +8,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
 
 
-# Tutorial 2.1 dichotomy
+# Tutorial 2.1 dichotomizer
 # def linear_discriminant(w, x, w0):
 #    g = np.dot(w, x) + w0
 #    return g
@@ -17,20 +19,20 @@ from sklearn.decomposition import PCA
 # X = np.array([1, 1])
 # g_x = linear_discriminant(W, X, W0)
 # if g_x > 0:
-#    print("The class of this vector is {}.".format(1))
+#    print("The class of this vector is 1.")
 # else:
-#    print("The class of this vector is {}.".format(2))
+#    print("The class of this vector is 2.")
 
 
-# Tutorial 2.2, 2.5 dichotomy in augmented feature space
+# Tutorial 2.2, 2.5 dichotomizer in augmented feature space
 # def aug_linear_discriminant(a, x):
 #    y = np.insert(x, 0, 1)
 #    g = np.dot(a, y)
 #    return g
 
 
-# a_t = np.array([-3, 1, 2, 2, 2, 4])
-# X = np.array([1, 1, 1, 1, 1])
+# a_t = np.array([-5, 2, 1])
+# X = np.array([1, 1])
 # g_x = aug_linear_discriminant(a_t, X.T)
 # if g_x > 0:
 #    print("The class of this vector is {}.".format(1))
@@ -40,7 +42,7 @@ from sklearn.decomposition import PCA
 
 # Tutorial 2.3 3D quadratic discriminant
 # def quadratic_discriminant_3d(x):
-#    g = pow(x[0], 2) - pow(x[2], 2) + 2 * x[1] * x[2] + 4 * x[0] * x[1] + 3 * x[0] - 2 * x[1] + 2
+#    g = x[0] ** 2 - x[2] ** 2 + 2 * x[1] * x[2] + 4 * x[0] * x[1] + 3 * x[0] - 2 * x[1] + 2
 #    return g
 
 
@@ -58,31 +60,35 @@ from sklearn.decomposition import PCA
 #    return g
 
 
-# A = np.array([[-2, 5], [5, -8]])
+# A = np.array([[2, 1], [1, 4]])
 # B = np.array([1, 2])
 # C = -3
 # X = np.array([1, 1])
 # g_x = quadratic_discriminant_2d(A, B, C, X)
 # if g_x > 0:
-#    print("The class of this vector is {}.".format(1))
+#    print("The class of this vector is 1.")
 # else:
-#    print("The class of this vector is {}.".format(2))
+#    print("The class of this vector is 2.")
 
 
-# Tutorial 2.6 batch perceptron y的第一位永远是1，注意题目有没有说sample normalisation，如果有，则第二类实例对应的y乘以-1,并且a的更新条件发生变化
+# Tutorial 2.6 batch perceptron
+# 没有sample normalisation, y的第一位都是1;
+# 如果有normalisation, 则第二类实例的y的第一位是-1并且x乘以-1, a的更新条件也发生变化
 # def batch_perceptron_with_sample_normalisation(a, lr, y):
 #    while True:
-#        miss_class = []
+#        mis_class = []
 #        y_mis = []
 #        temp = 0
 #        for i in range(len(y)):
 #            g = np.dot(a, y[i].T)
 #            if g > 0:
-#                miss_class.append('no')
+#                mis_class.append('no')
 #            else:
-#                miss_class.append('yes')
+#                mis_class.append('yes')
 #                y_mis.append(y[i])
-#        if miss_class.count('no') != len(miss_class):
+
+        # when g(x) > 0 for all y, the algorithm converges
+#        if mis_class.count('no') != len(mis_class):
 #            for j in range(len(y_mis)):
 #                temp += lr * y_mis[j]
 #            a += np.array(temp)
@@ -113,19 +119,21 @@ from sklearn.decomposition import PCA
 #            a += np.array(temp)
 #    return a
 
-# a_t = np.array([-25, 6, 3])
-# rate = 1
-# yk = np.array([[1, 1, 5],
-#               [1, 2, 5],
-#               [-1, -4, -1],
-#               [-1, -5, -1]])
+# a = np.array([-25, 6, 3])
+# lr = 1
+# y = np.array([[1, 1, 5],
+#              [1, 2, 5],
+#              [-1, -4, -1],
+#              [-1, -5, -1]])
 # label = [1, 1, 2, 2]
-# a_final = batch_perceptron_with_sample_normalisation(a_t, rate, yk)
-# a_final = batch_perceptron(a_t, rate, yk, label)
-# print("The value of a after learning is: {}.".format(a_final))
+# a_final = batch_perceptron_with_sample_normalisation(a, lr, y)
+# a_final = batch_perceptron(a, lr, y, label)
+# print("The value of a after learning is:", a_final)
 
 
-# Tutorial 2.7, 2.9, 2.10 sequential perceptron y的第一位永远是1，注意题目有没有说sample normalisation，如果有，则第二类实例对应的y乘以-1，并且a的更新条件和更新等式都发生变化
+# Tutorial 2.7, 2.9, 2.10 sequential perceptron
+# 没有sample normalisation, y的第一位都是1;
+# 如果有normalisation, 则第二类实例的y的第一位是-1且x乘以-1, 并且a的更新条件和更新等式都发生变化
 # def sequential_perceptron(a, lr, yk, labels):
 #    while True:
 #        pred_label = []
@@ -158,16 +166,18 @@ from sklearn.decomposition import PCA
 
 
 # if __name__ == '__main__':
-#    a_t = np.array([-25, 6, 3])
+#    a_t = np.array([1, 0, 0])
 #    rate = 1
-#    data_set = np.array([[1, 1, 5],
-#                         [1, 2, 5],
-#                         [-1, -4, -1],
-#                         [-1, -5, -1]])
+#    data_set = np.array([[1, 0, 2],
+#                         [1, 1, 2],
+#                         [1, 2, 1],
+#                         [-1, 3, -1],
+#                         [-1, 2, 1],
+#                         [-1, 3, 2]])
 #    label = [1, 1, 1, -1, -1, -1]
 #    a_final = sequential_perceptron(a_t, rate, data_set, label)
 #    a_final = sequential_perceptron_with_sample_normalisation(a_t, rate, data_set)
-#    print("The value of a after learning is: {}.".format(a_final))
+#    print("The value of a after learning is:", a_final)
 
 
 # Tutorial 2.11 sequential multiclass perceptron
@@ -181,20 +191,20 @@ from sklearn.decomposition import PCA
 #            if g1 == g2 == g3:
 #                a[2] -= lr * y[i]
 #                a[labels[i]-1] += lr * y[i]
-#            if g1 > g2 > g3 or g1 > g3 > g2 or g1 > g2 == g3:
+#            if g1 == max(g1, g2, g3):
 #                if labels[i] != 1:
 #                    a[labels[i]-1] += lr * y[i]
 #                    a[0] -= lr * y[i]
-#            elif g2 > g1 > g3 or g2 > g3 > g1 or g2 > g1 == g3:
+#            elif g2 == max(g1, g2, g3):
 #                if labels[i] != 2:
 #                    a[labels[i]-1] += lr * y[i]
 #                    a[1] -= lr * y[i]
-#            elif g3 > g1 > g2 or g3 > g2 > g1 or g3 > g1 == g2:
+#            elif g3 == max(g1, g2, g3):
 #                if labels[i] != 3:
 #                    a[labels[i]-1] += lr * y[i]
 #                    a[2] -= lr * y[i]
 #            n += 1
-#            print("n = {}, a1 = {}, a2 = {}, a3 = {}".format(n, a[0], a[1], a[2]))
+#            print("n = {0}, a1 = {1}, a2 = {2}, a3 = {3}".format(n, a[0], a[1], a[2]))
 
 
 # a_t = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
@@ -208,43 +218,44 @@ from sklearn.decomposition import PCA
 # Y = np.array([[1, 0, 2],
 #              [1, 1, 2],
 #              [1, 2, 1],
-#             [-1, 3, -1],
-#             [-1, 2, 1],
+#              [-1, 3, -1],
+#              [-1, 2, 1],
 #              [-1, 3, 2]])
-# b = np.array([1, 1, 1, 2, 2, 2])
+# b = np.array([2, 2, 2, 1, 1, 1])
 # a = np.dot(np.linalg.pinv(Y), b.T)
-# print("a = {}".format(a))
+# print("a =", a)
 
+# Tutorial 2.14 参考 Sequential_Widrow_Hoff.py
 
 # Tutorial 2.15 KNN
-# knn = KNeighborsClassifier(n_neighbors=3)  # Define KNN classier model (n_neighbors represents the value of k)
-# y = np.array([1, 2, 2, 3, 3])  # specify prediction target
+# knn = KNeighborsClassifier(n_neighbors=1)
+# y = np.array([1, 2, 2, 3, 3])  # prediction target
 # X = np.array([[0.15, 0.35],
 #              [0.15, 0.28],
 #              [0.12, 0.2],
 #              [0.1, 0.32],
-#              [0.06, 0.25]])  # choose features, y = f(X)
-# knn.fit(X, y)  # fit the model (the heart of modelling)
-# print(knn.predict([[0.1, 0.25]]))  # using this model to predict
+#              [0.06, 0.25]])
+# knn.fit(X, y)
+# print(knn.predict([[0.1, 0.25]]))
 
 
-# Tutorial 3.2
+# Tutorial 3.2 Heaviside
 # def heaviside(w, x, threshold):
 #    y = np.dot(w, x.T) - threshold
 #    if y > 0:
-#        print("The output of neuron is: {}".format(1))
+#        print("The output of neuron is: 1")
 #    else:
-#        print("The output of neuron is: {}".format(0))
+#        print("The output of neuron is: 0")
 
 
 # W = np.array([0.1, -0.5, 0.4])
 # thresh = 0
 # x1 = np.array([0.1, -0.5, 0.4])
 # x2 = np.array([0.1, 0.5, 0.4])
-# heaviside(W, x2, thresh)
+# heaviside(W, x1, thresh)
 
 
-# Tutorial 3.3, 3.5, 3.6
+# Tutorial 3.3, 3.5, 3.6 Sequential Delta
 # w = [w0, w1, ..., wn], w0=-theta
 # def sequential_delta(w, lr, t, x):
 #    n = 0
@@ -258,12 +269,12 @@ from sklearn.decomposition import PCA
 #                y.append(0)
 #            w = w + lr * (t[i] - y[i]) * np.insert(x[i], 0, 1)
 #            n += 1
-#            print("n = {}, y = {}, w = {}".format(n, y[i], w))
+#            print("n = {0}, y = {1}, w = {2}".format(n, y[i], w))
 #        if y == t:
 #            break
 
 
-# Tutorial 3.4
+# Tutorial 3.4 batch Delta
 # def batch_delta(w, lr, t, x):
 #    epoch = 0
 #    while True:
@@ -279,31 +290,32 @@ from sklearn.decomposition import PCA
 #            Temp.append(temp)
 #        w += sum(Temp)
 #        epoch += 1
-#        print("epoch = {}, w = {}".format(epoch, w))
+#        print("epoch = {0}, w = {1}".format(epoch, w))
 #        if y == t:
 #            break
 
 
-# thresh = -1
+# theta = -1
 # w1 = 0
 # w2 = 0
 # rate = 1
-# W = np.array([-thresh, w1, w2])
-# T = [1, 1, 1, 0, 0, 0]
-# X = np.array([[0, 2], [1, 2], [2, 1], [-3, 1], [-2, -1], [-3, -2]])
+# W = np.array([-theta, w1, w2])
+# T = [1, 1, 1, 0, 0, 0]  # y (target output)
+# X = np.array([[0, 2], [1, 2], [2, 1], [-3, 1], [-2, -1], [-3, -2]])  # 直接输入x的值
 # sequential_delta(W, rate, T, X)
+# batch_delta(W, rate, T, X)
 
 
-# Tutorial 3.7, 3.8
+# Tutorial 3.7, 3.8 negative feedback network
 # def negative_feedback(x, w, alpha, n):
 #    y = np.array([0, 0])
 #    for i in range(0, n):
 #        e = x.T - np.dot(w.T, y.T)
 #        y = y + alpha * np.dot(w, e)
-#        print("i = {}, the activation of the output neurons: {}".format(i+1, y))
+#        print("i = {0}, the activation of the output neurons: {1}".format(i+1, y))
 
 
-# Tutorial 3.9
+# Tutorial 3.9 negative feedback network (more stable method)
 # def negative_feedback_stable(x, w1, w2, n, e1, e2):
 #    y = np.array([0, 0])
 #    for i in range(0, n):
@@ -316,7 +328,7 @@ from sklearn.decomposition import PCA
 #        for k in range(len(y)):
 #            b.append(max(y[k], e1))
 #        y = np.array(b) * np.dot(w2, e)
-#        print("i = {}, the activation of the output neurons: {}".format(i + 1, y))
+#        print("i = {0}, the activation of the output neurons: {1}".format(i + 1, y))
 
 
 # X = np.array([1, 1, 0])
@@ -325,10 +337,11 @@ from sklearn.decomposition import PCA
 #              [1, 1, 1]])
 # w = np.array([[1/2, 1/2, 0],
 #              [1/3, 1/3, 1/3]])
-# count = 5
+# count = 5  # iterations
 # e_1 = 0.01
 # e_2 = 0.01
 # negative_feedback_stable(X, W, w, count, e_1, e_2)
+# negative_feedback(X, W, Alpha, count)
 
 
 # Tutorial 4.1 total connection weights
@@ -355,7 +368,7 @@ from sklearn.decomposition import PCA
 # n_out = 3
 # hid = [4, 5]
 # num_hidden = 2
-# Bias = True
+# Bias = True  # with biases, True; otherwise, False
 # print("Total number of weights:", total_connection_weights(n_in, n_out, hid, num_hidden, Bias))
 
 
@@ -365,30 +378,30 @@ from sklearn.decomposition import PCA
 #    y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
 #    temp_z = np.dot(w3, y) + w4
 #    z = 1 / (1 + 1 / (pow(math.e, temp_z)))
-#    print("y = {}, z = {}".format(y, z))
-#    print("This pattern is represented by", [round(z[0]), round(z[1])])
+#    print("y = {0}, z = {1}".format(y, z))
+#    print("This pattern is represented by", [round(i) for i in z])
 
 
 # W1 = np.array([[-0.7057, 1.9061, 2.6605, -1.1359],
 #               [0.4900, 1.9324, -0.4269, -5.1570],
-#               [0.9438, -5.4160, -0.3431, -0.2931]])
-# W2 = np.array([4.8432, 0.3973, 2.1761])
-# W3 = np.array([[-1.1444, 0.3115, -9.9812], [0.0106, 11.5477, 2.6479]])
-# W4 = np.array([2.5230, 2.6463])
-# X = np.array([1, 1, 0, 0])
+#               [0.9438, -5.4160, -0.3431, -0.2931]])  # W_ji
+# W2 = np.array([4.8432, 0.3973, 2.1761])  # W_j0
+# W3 = np.array([[-1.1444, 0.3115, -9.9812], [0.0106, 11.5477, 2.6479]])  # W_kj
+# W4 = np.array([2.5230, 2.6463])  # W_k0
+# X = np.array([1, 1, 0, 0])  # pattern
 # represent_patterns(W1, W2, W3, W4, X)
 
 
-# Tutorial 4.5
+# Tutorial 4.5 具体参考 PNN-Tutorial6-Solutions.ppt
 # Q.a
-# w = np.array([[0.5, 0], [0.3, -0.7]])
-# w0 = np.array([0.2, 0])
+# w = np.array([[0.5, 0], [0.3, -0.7]])  # w11=0.5, w12=0; w21=0.3, w22=-0.7
+# w0 = np.array([0.2, 0])  # w10=0.2, w20=0
 # x = np.array([0.1, 0.9])
 # temp_y = np.dot(w, x.T) + w0
 # y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
 # temp_z = 0.8 * y[0] + 1.6 * y[1] - 0.4
 # z = 2 / (1 + 1 / pow(math.e, 2 * temp_z)) - 1
-# print("y = {}, z = {}".format(y, z))
+# print("y = {0}, z = {1}".format(y, z))
 
 # Q.c
 # lr = 0.25
@@ -400,9 +413,10 @@ from sklearn.decomposition import PCA
 # w22 = -0.7
 # m12 = 1.6
 # a = w21 * x[0] + w22 * x[1]
-# temp_w = -lr * (z - t) * ((4 / pow(math.e, 2 * temp_z)) / pow(1 + 1 / pow(math.e, 2 * temp_z), 2)) * m12 * ((4 / pow(math.e, 2 * a)) / pow(1 + 1 / pow(math.e, 2 * a), 2)) * x[0]
+# temp_w = -lr * (z - t) * ((4 / pow(math.e, 2 * temp_z)) / pow(1 + 1 / pow(math.e, 2 * temp_z), 2)) \
+#         * m12 * ((4 / pow(math.e, 2 * a)) / pow(1 + 1 / pow(math.e, 2 * a), 2)) * x[0]
 # w21 += temp_w
-# print("m10 = {}, w21 = {}".format(m10, w21))
+# print("m10 = {0}, w21 = {1}".format(m10, w21))
 
 
 # Tutorial 4.6
@@ -411,17 +425,17 @@ from sklearn.decomposition import PCA
 # c2 = np.array([1, 1])
 # c = abs(c1 - c2)
 # n_H = 2
-# x = np.array([1.8, 0.6])
+# x = np.array([0.5, -0.1])
 # sd = np.linalg.norm(c) / math.sqrt(2 * n_H)
 # d1 = abs(x - c1)
 # y1 = pow(math.e, -pow(np.linalg.norm(d1), 2) / (2 * pow(sd, 2)))
 # d2 = abs(x - c2)
 # y2 = pow(math.e, -pow(np.linalg.norm(d2), 2) / (2 * pow(sd, 2)))
-# print("y1 = {}, y2 = {}".format(y1, y2))
+# print("y1 = {0}, y2 = {1}".format(y1, y2))
 
 # Q.c least squares method
-# 代入不同的x，分别计算出y1和y2；注意fai_x是square matrix和non-square matrix的计算公式不同，别忘了最后一列的1
-# fai_x = np.array([[0.7711, 0.2322, 1], [0.2276, 0.2276, 1], [0.4819, 0.5886, 1], [0.0273, 0.4493, 1]])
+# 代入不同的x, 分别计算出y1和y2; fai_x的第一列是y1, 第二列是y2, 第三列全1
+# fai_x = np.array([[1.0, 0.1353, 1], [0.3679, 0.3679, 1], [0.3679, 0.3679, 1], [0.1353, 1.0, 1]])
 # t = np.array([0, 1, 1, 0])
 # temp1 = np.dot(fai_x.T, t)
 # temp2 = np.dot(fai_x.T, fai_x)
@@ -429,23 +443,23 @@ from sklearn.decomposition import PCA
 # print("The output weights using the least squares method is:", W)
 
 # Q.d determine classes
-# W = [-2.50312891, -2.50312891, 2.84180225]
+# W = [-2.50312891, -2.50312891, 2.84180225]  # 用c中计算出的权重值W
 # z = []
 # Class = []
 # for i in range(len(fai_x)):
-#     z.append(W[0] * fai_x[i][0] + W[1] * fai_x[i][1] + W[2])
+#    z.append(W[0] * fai_x[i][0] + W[1] * fai_x[i][1] + W[2])
 # for i in range(len(z)):
-#     if z[i] > 0.5:
-#         Class.append(1)
-#     else:
-#         Class.append(0)
+#    if z[i] > 0.5:
+#        Class.append(1)
+#    else:
+#        Class.append(0)
 # for i in range(len(Class)):
 #    print(Class[i], end=' ')
 
 
 # Tutorial 4.7
 # Q.a
-# The answer of it is located at Jupyter Notebook
+# The answer is located at Jupyter Notebook
 
 # Q.c, Q.d, Q.e
 # Q.d 受小数位精度影响，输出结果的小数位和答案的小数位不同
@@ -474,7 +488,7 @@ from sklearn.decomposition import PCA
 #    print("p = {}, y1 = {}, y2 = {}, y3 = {}".format(i + 1, y1, y2, y3))
 #    print("p = {}, y1 = {}, y2 = {}, y3 = {}, y4 = {}".format(i + 1, y1, y2, y3, y4))
 # fai_x = np.array(fai_x)
-# fai_x = fai_x.reshape((12, 4))
+# fai_x = fai_x.reshape((len(x), 4))  # 列数是y1, y2...的个数+1
 # temp1 = np.dot(fai_x.T, t)
 # temp2 = np.dot(fai_x.T, fai_x)
 # W = np.dot(np.linalg.inv(temp2), temp1)
@@ -492,25 +506,18 @@ from sklearn.decomposition import PCA
 # Tutorial 5.4 activation functions
 # ReLU
 # net = np.array([[1, 0.5, 0.2], [-1, -0.5, -0.2], [0.1, -0.1, 0]])
-# for i in range(len(net)):
-#    for j in range(len(net[i])):
-#        if net[i][j] < 0:
-#            net[i][j] = 0
-# print(net)
+# net_tensor = torch.from_numpy(net)
+# relu = ReLU()
+# print(relu(net_tensor))
 
 # LReLU when a = 0.1
 # a = 0.1
-# for i in range(len(net)):
-#    for j in range(len(net[i])):
-#        if net[i][j] < 0:
-#            net[i][j] = a * net[i][j]
-# print(net)
+# lrelu = LeakyReLU(a)
+# print(lrelu(net_tensor))
 
 # tanh
-# for i in range(len(net)):
-#    for j in range(len(net[i])):
-#            net[i][j] = np.tanh(net[i][j])
-# print(net)
+# tanh = Tanh()
+# print(tanh(net_tensor))
 
 # Heaviside function with 0.1 threshold and define H(0) as 0.5
 # for i in range(len(net)):
@@ -557,7 +564,7 @@ from sklearn.decomposition import PCA
 # batch_normalisation(x_1, x_2, x_3, x_4, b, r, e)
 
 
-# Tutorial 5.6
+# Tutorial 5.6 feature maps, convolution layer, padding, stride
 # a. padding = 0, stride = 1
 # X1 = np.array([[0.2, 1, 0], [-1, 0, -0.1], [0.1, 0, 0.1]])
 # X2 = np.array([[1, 0.5, 0.2], [-1, -0.5, -0.2], [0.1, -0.1, 0]])
@@ -572,7 +579,7 @@ from sklearn.decomposition import PCA
 #            out2.append(sum(sum(X2[i: i + 2, j: j + 2] * H2)))
 #        else:
 #            break
-# out1 = np.array(out1).reshape(2, 2)
+# out1 = np.array(out1).reshape(2, 2)  # 输出结构根据X和H决定
 # out2 = np.array(out2).reshape(2, 2)
 # out = out1 + out2
 # print("The result of padding = 0 and stride = 1 is:\n", out)
@@ -608,7 +615,7 @@ from sklearn.decomposition import PCA
 # print("The result of padding = 0, stride = 1 and dilation = 2 is:\n", out_d)
 
 
-# Tutorial 5.7
+# Tutorial 5.7 feature maps, convolution layer
 # x1 = np.array([[0.2, 1, 0], [-1, 0, -0.1], [0.1, 0, 0.1]])
 # x2 = np.array([[1, 0.5, 0.2], [-1, -0.5, -0.2], [0.1, -0.1, 0]])
 # x3 = np.array([[0.5, -0.5, -0.1], [0, -0.4, 0], [0.5, 0.5, 0.2]])
@@ -621,38 +628,23 @@ from sklearn.decomposition import PCA
 # print(y)
 
 
-# Tutorial 5.8
-# a. average pooling with a pooling region of 2-by-2 and stride = 2
-# x = np.array([[0.2, 1, 0, 0.4], [-1, 0, -0.1, -0.1], [0.1, 0, -1, -0.5], [0.4, -0.7, -0.5, 1]])
-# avg_pooling = []
-# for i in range(0, len(x), 2):
-#    for j in range(0, len(x), 2):
-#        avg = np.mean(x[i: i + 2, j: j + 2])
-#        avg_pooling.append(avg)
-# avg_pooling = np.array(avg_pooling).reshape(2, 2)
-# print("The result of average pooling is:\n", avg_pooling)
+# Tutorial 5.8 pooling layer
+# a. average pooling with a pooling region of 2-by-2 (kernel size) and stride = 2
+# x = torch.tensor([[[0.2, 1, 0, 0.4], [-1, 0, -0.1, -0.1], [0.1, 0, -1, -0.5], [0.4, -0.7, -0.5, 1]]])
+# avg_pool2d = AvgPool2d(2, stride=2)
+# print("The result of average pooling with 2-by-2 kernel and 2 stride is:\n", avg_pool2d(x))
 
 # b. max pooling with a pooling region of 2-by-2 and stride = 2
-# max_pooling = []
-# for i in range(0, len(x), 2):
-#    for j in range(0, len(x), 2):
-#        maximum = np.max(x[i: i + 2, j: j + 2])
-#        max_pooling.append(maximum)
-# max_pooling = np.array(max_pooling).reshape(2, 2)
-# print("The result of max pooling with stride = 2 is:\n", max_pooling)
+# max_pool2d = MaxPool2d(2, stride=2)
+# print("The result of max pooling with 2-by-2 kernel and 2 stride is:\n", max_pool2d(x))
 
 # c. max pooling with a pooling region of 3-by-3 and stride = 1
-# max_pool = []
-# for i in range(0, 2):
-#    for j in range(0, 2):
-#        maximum_ = np.max(x[i: i + 3, j: j + 3])
-#        max_pool.append(maximum_)
-# max_pool = np.array(max_pool).reshape(2, 2)
-# print("The result of max pooling with stride = 2 is:\n", max_pool)
+# max_pool2d_ = MaxPool2d(3, stride=1)
+# print("The result of max pooling with 3-by-3 kernel and 1 stride is:\n", max_pool2d_(x))
 
 
-# Tutorial 5.9, 5.10
-# number of masks = number of channels
+# Tutorial 5.9, 5.10 size of output
+# 5.10 sequence of layers: 每一层的输出作为下一层的输入
 # dim_feature_map = [98, 98]
 # dim_mask = [4, 4]
 # padding = 1
@@ -662,24 +654,59 @@ from sklearn.decomposition import PCA
 # outputWidth = 1 + (dim_feature_map[1] - dim_mask[1] + 2 * padding) / stride
 # print("The output size is:", (outputHeight, outputWidth, num_masks))
 # len_feature_vec = outputHeight * outputWidth * num_masks
-# print("after flattening, length of feature vector is:", len_feature_vec)
+# print("After flattening, length of feature vector is:", len_feature_vec)
 
 
 # Tutorial 6.3
 # a. compute V(D, G)
+
+# real samples
 # x1 = np.transpose(np.array([1, 2]))
 # x2 = np.transpose(np.array([3, 4]))
-# x_real = np.array([x1, x2])
+
+# fake samples
 # x_1 = np.transpose(np.array([5, 6]))
 # x_2 = np.transpose(np.array([7, 8]))
-# x_fake = np.array([x_1, x_2])
+
 # theta_d1, theta_d2 = 0.1, 0.2
+
+# real and fake samples have equal probability to be selected; 0.5
 # E1 = 0.5 * math.log(pow(1 + pow(math.e, -(theta_d1 * x1[0] - theta_d2 * x1[1] - 2)), -1), math.e) + \
 #    0.5 * math.log(pow(1 + pow(math.e, -(theta_d1 * x2[0] - theta_d2 * x2[1] - 2)), -1), math.e)
 # E2 = 0.5 * math.log(1 - pow(1 + pow(math.e, -(theta_d1 * x_1[0] - theta_d2 * x_1[1] - 2)), -1), math.e) + \
 #    0.5 * math.log(1 - pow(1 + pow(math.e, -(theta_d1 * x_2[0] - theta_d2 * x_2[1] - 2)), -1), math.e)
+
 # V_D_G = E1 + E2
 # print("The value of V(D, G) is:", V_D_G)
+
+# b. determine the updated theta values
+# lr = 0.02
+# m = 2  # number of real samples/generated samples
+# x_real = np.array([x1, x2])
+# x_fake = np.array([x_1, x_2])
+# alpha1_1 = (x_real[0][0] * pow(math.e, - (theta_d1 * x_real[0][0] - theta_d2 * x_real[0][1] - 2))) / \
+#    (1 + pow(math.e, -(theta_d1 * x_real[0][0] - theta_d2 * x_real[0][1] - 2)))
+# beta1_1 = -(x_fake[0][0] * pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2))) / \
+#          (pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2)) * (pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2)) + 1))
+# temp1 = alpha1_1 + beta1_1
+# alpha2_1 = -(x_real[0][1] * pow(math.e, - (theta_d1 * x_real[0][0] - theta_d2 * x_real[0][1] - 2))) / \
+#    (1 + pow(math.e, -(theta_d1 * x_real[0][0] - theta_d2 * x_real[0][1] - 2)))
+# beta2_1 = (x_fake[0][1] * pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2))) / \
+#          (pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2)) * (pow(math.e, -(theta_d1 * x_fake[0][0] - theta_d2 * x_fake[0][1] - 2)) + 1))
+# temp2 = alpha2_1 + beta2_1
+# alpha1_2 = (x_real[1][0] * pow(math.e, - (theta_d1 * x_real[1][0] - theta_d2 * x_real[1][1] - 2))) / \
+#    (1 + pow(math.e, -(theta_d1 * x_real[1][0] - theta_d2 * x_real[1][1] - 2)))
+# beta1_2 = (-x_fake[1][0] * pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2))) / \
+#          (pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2)) * (pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2)) + 1))
+# temp3 = alpha1_2 + beta1_2
+# alpha2_2 = -(x_real[1][1] * pow(math.e, -(theta_d1 * x_real[1][0] - theta_d2 * x_real[1][1] - 2))) / \
+#    (1 + pow(math.e, -(theta_d1 * x_real[1][0] - theta_d2 * x_real[1][1] - 2)))
+# beta2_2 = (x_fake[1][1] * pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2))) / \
+#          (pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2)) * (pow(math.e, -(theta_d1 * x_fake[1][0] - theta_d2 * x_fake[1][1] - 2)) + 1))
+# temp4 = alpha2_2 + beta2_2
+# change = (1 / m) * (np.array([temp1, temp2]) + np.array([temp3, temp4]))
+# updated_theta = np.array([theta_d1, theta_d2]) + lr * change
+# print("The updated theta value is:\n", updated_theta)
 
 
 # Tutorial 7.4, 7.6 Karhunen-Loeve Transform
@@ -687,31 +714,32 @@ from sklearn.decomposition import PCA
 #              [2, 3, 1],
 #              [3, 5, 1],
 #              [2, 2, 1]])
-# x = np.array([[0, 1],
-#              [3, 5],
-#              [5, 4],
-#              [5, 6],
-#              [8, 7],
-#              [9, 7]])
-# num_samples, num_features = x.shape
-# avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
-# x_norm = x - avg
+x = np.array([[0, 1],
+              [3, 5],
+              [5, 4],
+              [5, 6],
+              [8, 7],
+              [9, 7]])
+num_samples, num_features = x.shape
+avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
+x_norm = x - avg
 # cov_matrix = np.dot(np.transpose(x_norm), x_norm)
 # eig_val, eig_vec = np.linalg.eig(cov_matrix)
-# print(eig_val)
 # eig_pairs = [(np.abs(eig_val[i]), eig_vec[:, i]) for i in range(num_features)]
 # eig_pairs.sort(reverse=True)
-# select the top k eigenvectors
-# k = 1
-# feature = np.array([ele[1] for ele in eig_pairs[:k]])
-# get new data
-# data = np.dot(x_norm, np.transpose(feature))
-# print(data)  # the answer is still correct either or both columns can be multiplied by -1
 
-# Tutorial 7.7 Oja's learning rule using the same data used in 7.6
+# select the top k eigenvectors
+# k = 1  # project onto the first self-defined number of principal components
+# feature = np.array([ele[1] for ele in eig_pairs[:k]])
+# get transformed data
+# data = np.dot(x_norm, np.transpose(feature))
+# print(data)  # either or both columns can be multiplied by -1
+
+
+# Tutorial 7.7 Oja's learning rule
 # lr = 0.01
 # w = np.array([-1.0, 0.0])
-# epoch = 2
+# epoch = 6
 # for i in range(epoch):
 #    temp = []
 #    for j in range(len(x_norm)):
@@ -721,7 +749,7 @@ from sklearn.decomposition import PCA
 #    for k in range(len(temp)):
 #        total += temp[k]
 #    w += np.array(total)
-#    print(w)
+#    print("Epoch {0}: w = {1}".format(i+1, w))
 
 # Tutorial 7.10 Linear Discriminant Analysis Fisher's method
 # w1 = np.array([-1, 5])
@@ -731,8 +759,8 @@ from sklearn.decomposition import PCA
 #              [3, 3],
 #              [6, 5],
 #              [7, 8]])
-# x1 = x[:3]
-# x2 = x[3:]
+# x1 = x[:3]  # class 1
+# x2 = x[3:]  # class 2
 # num_class1, num_feature_class1 = x1.shape
 # mean_class1 = np.array([np.mean(x1[:, i]) for i in range(num_feature_class1)])
 # num_class2, num_feature_class2 = x2.shape
@@ -760,9 +788,14 @@ from sklearn.decomposition import PCA
 
 # Tutorial 7.11 Extreme Learning Machine
 # w = np.array([0, 0, 0, -1, 0, 0, 2])
-# X = np.array([[1, 1, 1, 1],
-#              [0, 0, 1, 1],
-#              [0, 1, 0, 1]])
+# x = np.array([[0, 0],
+#              [0, 1],
+#              [1, 0],
+#              [1, 1]])
+# X = []
+# for i in range(len(x)):
+#    X.append(np.insert(x[i], 0, 1))
+# X = np.array(X).reshape(4, 3).T
 # V = np.array([[-0.62, 0.44, -0.91],
 #              [-0.81, -0.09, 0.02],
 #              [0.74, -0.91, -0.60],
@@ -781,6 +814,8 @@ from sklearn.decomposition import PCA
 
 # Tutorial 7.12, 7.13 Sparse Coding
 # sparsity is measured as the count of elements that are non-zero
+# prefer sparser (less non-zero elements)
+
 # y1 = np.array([1, 0, 0, 0, 1, 0, 0, 0])
 # y2 = np.array([0, 0, 1, 0, 0, 0, -1, 0])
 # y2 = np.array([0, 0, 0, -1, 0, 0, 0, 0])
@@ -808,11 +843,11 @@ from sklearn.decomposition import PCA
 #              [4, -1],
 #              [3, 0],
 #              [5, 1]])
-# kmeans = KMeans(n_clusters=2).fit(X)
-# print("After {} iterations, the algorithm converges.".format(kmeans.n_iter_))
-# print("The assigned labels of these samples are:", kmeans.labels_)  # 输出的0对应课件中的2（Week10，P18）
-# print("The cluster centres are:\n", kmeans.cluster_centers_)  # 输出的顺序和课件中的顺序相反，填答案时记得倒置一下顺序
-# print(kmeans.predict())  # 使用训练后kmeans对象预测新的样本的标签
+# means_2 = KMeans(n_clusters=2).fit(X)
+# print("After {} iterations, the algorithm converges.".format(means_2.n_iter_))
+# print("The assigned labels of these samples are:", means_2.labels_)  # 输出的0对应课件中的2（PPT Week10, P18）
+# print("The cluster centres are:\n", means_2.cluster_centers_)  # 输出的顺序和课件中的顺序相反，填答案时记得倒置一下顺序
+# print(means_2.predict())  # 使用训练后的对象预测新样本的标签
 
 # Tutorial10 Q6 Agglomerative Clustering
 # X = np.array([[-1, 3],
@@ -821,12 +856,13 @@ from sklearn.decomposition import PCA
 #              [4, 0],
 #              [5, 4],
 #              [3, 2]])
-# n_clusters is the target number of clusters; linkage: ward, single, average, complete
+
+# n_clusters: target number of clusters; linkage: ward, single, average, complete
 # clustering = AgglomerativeClustering(n_clusters=3, linkage='single').fit(X)
 # print("The assigned labels of these samples are:", clustering.labels_)
 
 # Tutorial10 Q2 PCA
-# a, b
+# a., b.
 # X = np.array([[4, 2, 2],
 #              [0, -2, 2],
 #              [2, 4, 2],
@@ -835,17 +871,17 @@ from sklearn.decomposition import PCA
 # X_2d = pca_2d.fit_transform(X)
 # pca_1d = PCA(n_components=1)
 # X_1d = pca_1d.fit_transform(X)
-# kmeans_2d = KMeans(n_clusters=2).fit(X_2d)
-# kmeans_1d = KMeans(n_clusters=2).fit(X_1d)
+# means_2d = KMeans(n_clusters=2).fit(X_2d)
+# means_1d = KMeans(n_clusters=2).fit(X_1d)
 # new_data = np.array([[3, -2, 5], [3, -2, 5]])
 # new_data_2d = pca_2d.fit_transform(new_data)
 # new_data_1d = pca_1d.fit_transform(new_data)
 # print("Projecting the data onto 2D plane:\n", X_2d)
 # print("Projecting the data onto 1D plane:\n", X_1d)
-# print("The assigned labels in the transformed 2D samples are:", kmeans_2d.labels_)
-# print("The new data based on the transformed 2D samples belongs to:", kmeans_2d.predict(new_data_2d))
-# print("The assigned labels in the transformed 1D samples are:", kmeans_1d.labels_)
-# print("The new data based on the transformed 1D samples belong to:", kmeans_1d.predict(new_data_1d))
+# print("The assigned labels of the transformed 2D samples are:", means_2d.labels_)
+# print("The new data based on the transformed 2D samples belongs to:", means_2d.predict(new_data_2d))
+# print("The assigned labels of the transformed 1D samples are:", means_1d.labels_)
+# print("The new data based on the transformed 1D samples belong to:", means_1d.predict(new_data_1d))
 
 # Tutorial10 Q3 Competitive learning (without normalisation)
 # a. Find the cluster centres for each iteration
@@ -909,3 +945,33 @@ from sklearn.decomposition import PCA
 
 
 # Tutorial Q5 Fuzzy K-means algorithm
+# X = np.array([[-1.0, 3.0],
+#              [1.0, 4.0],
+#              [0.0, 5.0],
+#              [4.0, -1.0],
+#              [3.0, 0.0],
+#              [5.0, 1.0]])
+# b = 2
+# u = np.array([[1, 0.5, 0.5, 0.5, 0.5, 0], [0, 0.5, 0.5, 0.5, 0.5, 1]])
+# m1 = sum([(u[0][i] ** 2) * X[i] for i in range(len(X))]) / (sum([u[0][i] ** 2 for i in range(len(X))]))
+# m2 = sum([(u[1][i] ** 2) * X[i] for i in range(len(X))]) / (sum([u[1][i] ** 2 for i in range(len(X))]))
+# m1_list = [m1]
+# m2_list = [m2]
+# print("Iteration 1: m1 = {0}, m2 = {1}".format(m1, m2))
+# while True:
+#    for i in range(len(X)):
+#        u[0][i] = ((1 / np.linalg.norm(X[i] - m1)) ** (2 / (b-1))) / (((1 / np.linalg.norm(X[i] - m1)) ** (2 / (b-1))) + ((1 / np.linalg.norm(X[i] - m2)) ** (2 / (b-1))))
+#        u[1][i] = ((1 / np.linalg.norm(X[i] - m2)) ** (2 / (b-1))) / (((1 / np.linalg.norm(X[i] - m1)) ** (2 / (b-1))) + ((1 / np.linalg.norm(X[i] - m2)) ** (2 / (b-1))))
+#    m1 = sum([(u[0][i] ** 2) * X[i] for i in range(len(X))]) / (sum([u[0][i] ** 2 for i in range(len(X))]))
+#    m2 = sum([(u[1][i] ** 2) * X[i] for i in range(len(X))]) / (sum([u[1][i] ** 2 for i in range(len(X))]))
+#    m1_list.append(m1)
+#    m2_list.append(m2)
+#    current_iter = len(m1_list) - 1
+#    print("Iteration {0}: m1 = {1}, m2 = {2}".format(current_iter+1, m1_list[current_iter], m2_list[current_iter]))
+
+    # terminate when both coordinates of both clusters centres change by less than 0.5
+#    if (m1_list[current_iter] - m1_list[current_iter - 1])[0] < 0.5 and (m1_list[current_iter] - m1_list[current_iter - 1])[1] < 0.5:
+#        if (m2_list[current_iter] - m2_list[current_iter - 1])[0] < 0.5 and (m2_list[current_iter] - m2_list[current_iter - 1])[1] < 0.5:
+#            print("After {0} iterations, the algorithm converges.".format(current_iter+1))
+#            print("m1 = {0}, m2 = {1}".format(m1_list[current_iter], m2_list[current_iter]))
+#            break
