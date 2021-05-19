@@ -8,32 +8,34 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
 
 
-# Tutorial 2.1 dichotomizer
+# Tutorial 2.1 dichotomizer linear discriminant function
 # def linear_discriminant(w, x, w0):
 #    g = np.dot(w, x) + w0
 #    return g
 
 
-# W = np.array([2, 1])
-# W0 = -5
-# X = np.array([1, 1])
+# W = np.array([-1, -2])
+# W0 = 3
+# X = np.array([2.5, 1.5])
 # g_x = linear_discriminant(W, X, W0)
+# print(g_x)  # 如果不是dichotomizer, 不同的a_t对应不同的g_x, 取最大的g_x所对应的类别
 # if g_x > 0:
 #    print("The class of this vector is 1.")
 # else:
 #    print("The class of this vector is 2.")
 
 
-# Tutorial 2.2, 2.5 dichotomizer in augmented feature space
+# Tutorial 2.2, 2.5 augmented dichotomizer linear discriminant function
 # def aug_linear_discriminant(a, x):
 #    y = np.insert(x, 0, 1)
 #    g = np.dot(a, y)
 #    return g
 
 
-# a_t = np.array([-5, 2, 1])
-# X = np.array([1, 1])
+# a_t = np.array([-2, 1, 2, 1, 2])
+# X = np.array([0, -1, 0, 1])
 # g_x = aug_linear_discriminant(a_t, X.T)
+# print(g_x)  # 如果不是dichotomizer, 不同的a_t对应不同的g_x, 取最大的g_x所对应的类别
 # if g_x > 0:
 #    print("The class of this vector is {}.".format(1))
 # else:
@@ -166,14 +168,14 @@ from sklearn.decomposition import PCA
 
 
 # if __name__ == '__main__':
-#    a_t = np.array([1, 0, 0])
+#    a_t = np.array([-25, 5, 2])
 #    rate = 1
-#    data_set = np.array([[1, 0, 2],
-#                         [1, 1, 2],
+#    data_set = np.array([[1, 5, 1],
+#                         [1, 5, -1],
+#                         [1, 7, 0],
+#                         [1, 3, 0],
 #                         [1, 2, 1],
-#                         [-1, 3, -1],
-#                         [-1, 2, 1],
-#                         [-1, 3, 2]])
+#                         [1, 1, -1]])
 #    label = [1, 1, 1, -1, -1, -1]
 #    a_final = sequential_perceptron(a_t, rate, data_set, label)
 #    a_final = sequential_perceptron_with_sample_normalisation(a_t, rate, data_set)
@@ -207,11 +209,12 @@ from sklearn.decomposition import PCA
 #            print("n = {0}, a1 = {1}, a2 = {2}, a3 = {3}".format(n, a[0], a[1], a[2]))
 
 
-# a_t = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-# y_t = np.array([[1, 1, 1], [1, 2, 0], [1, 0, 2], [1, -1, 1], [1, -1, -1]])
+# a_t = np.array([[1, 0.5, 0.5, -0.75], [-1, 2, 2, 1], [2, -1, -1, 1]])
+# 记得将x的第一位插入1得到y
+# y_t = np.array([[1, 0, 1, 0], [1, 1, 0, 0], [1, 0.5, 0.5, 0.25], [1, 1, 1, 1], [1, 0, 0, 0]])
 # rate = 1
 # label = [1, 1, 2, 2, 3]
-# sequential_multiclass_perceptron(a_t, y_t, rate, label)
+# sequential_multiclass_perceptron(a_t, y_t, rate, label)  # press Control-C to stop
 
 
 # Tutorial 2.12, 2.13 pseudoinverse with sample normalisation
@@ -225,38 +228,41 @@ from sklearn.decomposition import PCA
 # a = np.dot(np.linalg.pinv(Y), b.T)
 # print("a =", a)
 
-# Tutorial 2.14 参考 Sequential_Widrow_Hoff.py
+# Tutorial 2.14 sequential widrow hoff
+# 参考 Sequential_Widrow_Hoff.py
 
-# Tutorial 2.15 KNN
-# knn = KNeighborsClassifier(n_neighbors=1)
-# y = np.array([1, 2, 2, 3, 3])  # prediction target
-# X = np.array([[0.15, 0.35],
-#              [0.15, 0.28],
-#              [0.12, 0.2],
-#              [0.1, 0.32],
-#              [0.06, 0.25]])
+# Tutorial 2.15 KNN k-nearest-neighbor
+# knn = KNeighborsClassifier(n_neighbors=5)
+# y = np.array([1, 1, 1, 2, 3])  # prediction target
+# X = np.array([[-2, 6],
+#              [-1, -4],
+#              [3, -1],
+#              [-3, -2],
+#              [-4, -5]])
 # knn.fit(X, y)
-# print(knn.predict([[0.1, 0.25]]))
+# print(knn.predict([[-2, 0]]))
 
 
-# Tutorial 3.2 Heaviside
-# def heaviside(w, x, threshold):
+# Tutorial 3.2 Heaviside function
+# 注意题目是否提到augmented notation, 如果提到, w = [w0, w1, ...], w0 = -theta, 且x的第一位插入1
+# def heaviside(w, x):
+#    threshold = -2
 #    y = np.dot(w, x.T) - threshold
-#    if y > 0:
+#    y = np.dot(w, x.T)  # augmented
+#    if y >= 0:
 #        print("The output of neuron is: 1")
 #    else:
 #        print("The output of neuron is: 0")
 
 
-# W = np.array([0.1, -0.5, 0.4])
-# thresh = 0
-# x1 = np.array([0.1, -0.5, 0.4])
-# x2 = np.array([0.1, 0.5, 0.4])
-# heaviside(W, x1, thresh)
+# theta = -2
+# W = np.array([-theta, 0.5, 1])
+# x = np.array([1, 0, -1])
+# heaviside(W, x)
 
 
 # Tutorial 3.3, 3.5, 3.6 Sequential Delta
-# w = [w0, w1, ..., wn], w0=-theta
+# augmented notation w = [w0, w1, ..., wn], w0=-theta
 # def sequential_delta(w, lr, t, x):
 #    n = 0
 #    while True:
@@ -295,20 +301,20 @@ from sklearn.decomposition import PCA
 #            break
 
 
-# theta = -1
-# w1 = 0
-# w2 = 0
+# theta = -2
+# w1 = 0.5
+# w2 = 1
 # rate = 1
 # W = np.array([-theta, w1, w2])
-# T = [1, 1, 1, 0, 0, 0]  # y (target output)
-# X = np.array([[0, 2], [1, 2], [2, 1], [-3, 1], [-2, -1], [-3, -2]])  # 直接输入x的值
+# T = [1, 1, 0, 0, 0]  # y (target output)
+# X = np.array([[0, 2], [2, 1], [-3, 1], [-2, -1], [0, -1]])  # 直接输入x的值
 # sequential_delta(W, rate, T, X)
 # batch_delta(W, rate, T, X)
 
 
 # Tutorial 3.7, 3.8 negative feedback network
 # def negative_feedback(x, w, alpha, n):
-#    y = np.array([0, 0])
+#    y = np.array([0, 0])  # assuming activations are initialised to be all 0
 #    for i in range(0, n):
 #        e = x.T - np.dot(w.T, y.T)
 #        y = y + alpha * np.dot(w, e)
@@ -317,7 +323,7 @@ from sklearn.decomposition import PCA
 
 # Tutorial 3.9 negative feedback network (more stable method)
 # def negative_feedback_stable(x, w1, w2, n, e1, e2):
-#    y = np.array([0, 0])
+#    y = np.array([0, 0])  # assuming activations are initialised to be all 0
 #    for i in range(0, n):
 #        a = []
 #        b = []
@@ -332,12 +338,12 @@ from sklearn.decomposition import PCA
 
 
 # X = np.array([1, 1, 0])
-# Alpha = 0.5
+# Alpha = 0.25
 # W = np.array([[1, 1, 0],
 #              [1, 1, 1]])
 # w = np.array([[1/2, 1/2, 0],
 #              [1/3, 1/3, 1/3]])
-# count = 5  # iterations
+# count = 4  # iterations
 # e_1 = 0.01
 # e_2 = 0.01
 # negative_feedback_stable(X, W, w, count, e_1, e_2)
@@ -392,10 +398,10 @@ from sklearn.decomposition import PCA
 # represent_patterns(W1, W2, W3, W4, X)
 
 
-# Tutorial 4.5 具体参考 PNN-Tutorial6-Solutions.ppt
+# Tutorial 4.5 neural network
 # Q.a
-# w = np.array([[0.5, 0], [0.3, -0.7]])  # w11=0.5, w12=0; w21=0.3, w22=-0.7
-# w0 = np.array([0.2, 0])  # w10=0.2, w20=0
+# w = np.array([[0.5, 0], [0.3, -0.7]])  # from left to right, w11, w12; w21, w22
+# w0 = np.array([0.2, 0])  # from left to right, w10, w20
 # x = np.array([0.1, 0.9])
 # temp_y = np.dot(w, x.T) + w0
 # y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
@@ -419,13 +425,13 @@ from sklearn.decomposition import PCA
 # print("m10 = {0}, w21 = {1}".format(m10, w21))
 
 
-# Tutorial 4.6
+# Tutorial 4.6 radial basis function RBF
 # Q.b
-# c1 = np.array([0, 0])
+# c1 = np.array([-1, -1])
 # c2 = np.array([1, 1])
 # c = abs(c1 - c2)
-# n_H = 2
-# x = np.array([0.5, -0.1])
+# n_H = 2  # the number of hidden units
+# x = np.array([1, -1])
 # sd = np.linalg.norm(c) / math.sqrt(2 * n_H)
 # d1 = abs(x - c1)
 # y1 = pow(math.e, -pow(np.linalg.norm(d1), 2) / (2 * pow(sd, 2)))
@@ -710,19 +716,15 @@ from sklearn.decomposition import PCA
 
 
 # Tutorial 7.4, 7.6 Karhunen-Loeve Transform
-# x = np.array([[1, 2, 1],
-#              [2, 3, 1],
-#              [3, 5, 1],
-#              [2, 2, 1]])
-x = np.array([[0, 1],
-              [3, 5],
-              [5, 4],
-              [5, 6],
-              [8, 7],
-              [9, 7]])
-num_samples, num_features = x.shape
-avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
-x_norm = x - avg
+# x = np.array([[1, 2],
+#              [3, 5],
+#              [5, 4],
+#              [8, 7],
+#              [11, 7]])
+# num_samples, num_features = x.shape
+# avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
+# x_norm = x - avg  # zero-mean
+# print("The equivalent zero-mean data is:", x_norm)
 # cov_matrix = np.dot(np.transpose(x_norm), x_norm)
 # eig_val, eig_vec = np.linalg.eig(cov_matrix)
 # eig_pairs = [(np.abs(eig_val[i]), eig_vec[:, i]) for i in range(num_features)]
@@ -739,7 +741,7 @@ x_norm = x - avg
 # Tutorial 7.7 Oja's learning rule
 # lr = 0.01
 # w = np.array([-1.0, 0.0])
-# epoch = 6
+# epoch = 2
 # for i in range(epoch):
 #    temp = []
 #    for j in range(len(x_norm)):
@@ -751,9 +753,13 @@ x_norm = x - avg
 #    w += np.array(total)
 #    print("Epoch {0}: w = {1}".format(i+1, w))
 
+# the 1st principal component using w calculated by Oja
+# print("Project zero-mean data onto the first principal component is:", np.dot(w, x_norm.T))
+
+
 # Tutorial 7.10 Linear Discriminant Analysis Fisher's method
 # w1 = np.array([-1, 5])
-# w2 = np.array([2, -3])
+# w2 = np.array([2, -6])
 # x = np.array([[1, 2],
 #              [2, 1],
 #              [3, 3],
@@ -816,57 +822,84 @@ x_norm = x - avg
 # sparsity is measured as the count of elements that are non-zero
 # prefer sparser (less non-zero elements)
 
-# y1 = np.array([1, 0, 0, 0, 1, 0, 0, 0])
-# y2 = np.array([0, 0, 1, 0, 0, 0, -1, 0])
-# y2 = np.array([0, 0, 0, -1, 0, 0, 0, 0])
-# V = np.array([[0.4, 0.55, 0.5, -0.1, -0.5, 0.9, 0.5, 0.45],
-#              [-0.6, -0.45, -0.5, 0.9, -0.5, 0.1, 0.5, 0.55]])
-# x = np.array([-0.05, -0.95])
+# y1 = np.array([1, 2, 0, -1])
+# y2 = np.array([0, 0.5, 1, 0])
+# V = np.array([[1, 1, 2, 1],
+#              [-4, 3, 2, -1]])
+# x = np.array([2, 3])
+# a = 1  # trade-off parameter
 # sparsity1 = np.count_nonzero(y1)
 # sparsity2 = np.count_nonzero(y2)
-# print("The sparsity of these two alternatives is:", sparsity1, sparsity2)
+# print("The sparsity of these two alternatives is:", sparsity1, sparsity2)  # 选较小的值
 # error1 = np.linalg.norm(x.T - np.dot(V, y1.T))
+# cost1 = np.linalg.norm(x.T - np.dot(V, y1.T)) + a * np.count_nonzero(y1)
 # error2 = np.linalg.norm(x.T - np.dot(V, y2.T))
-# print("The reconstruction errors for these two alternatives are:", error1, error2)
-# if error1 > error2:
-#    print("solution 2 is the better sparse code.")
-# elif error1 < error2:
-#    print("solution 1 is the better sparse code.")
-# else:
-#    print("They have the same reconstruction error.")
+# cost2 = np.linalg.norm(x.T - np.dot(V, y2.T)) + a * np.count_nonzero(y2)
+# print("The reconstruction errors for these two alternatives are:", error1, error2)  # 选较小的值
+# print("The costs for these two alternatives are:", cost1, cost2)  # 选较小的值
 
 
 # Tutorial10 Q1 K-Means Clustering
+# def kmeans(x, m1, m2, m1_list, m2_list):
+#    while True:
+#        Class = []
+#        for i in range(len(x)):
+#            dist1 = np.linalg.norm(x[i] - m1)
+#            dist2 = np.linalg.norm(x[i] - m2)
+#            if dist2 == min(dist1, dist2):
+#                Class.append(2)
+#            elif dist1 == min(dist1, dist2):
+#                Class.append(1)
+#        c1_data = []
+#        c2_data = []
+#        for i in range(len(Class)):
+#            if Class[i] == 1:
+#                c1_data.append(x[i])
+#            elif Class[i] == 2:
+#                c2_data.append(x[i])
+#        c1_data = np.array(c1_data)
+#        m1 = np.mean(c1_data, axis=0)
+#        m1_list.append(m1)
+#        c2_data = np.array(c2_data)
+#        m2 = np.mean(c2_data, axis=0)
+#        m2_list.append(m2)
+#        now_index = len(m1_list) - 1
+#        print("Iteration {0}: m1 = {1}, m2 = {2}".format(now_index, m1_list[now_index], m2_list[now_index]))
+#        if (m1_list[now_index] == m1_list[now_index - 1]).all():
+#            if (m2_list[now_index] == m2_list[now_index - 1]).all():
+#                break
+#    print("The class for these samples are:", Class)
+
+
 # X = np.array([[-1, 3],
 #              [1, 4],
 #              [0, 5],
 #              [4, -1],
 #              [3, 0],
 #              [5, 1]])
-# means_2 = KMeans(n_clusters=2).fit(X)
-# print("After {} iterations, the algorithm converges.".format(means_2.n_iter_))
-# print("The assigned labels of these samples are:", means_2.labels_)  # 输出的0对应课件中的2（PPT Week10, P18）
-# print("The cluster centres are:\n", means_2.cluster_centers_)  # 输出的顺序和课件中的顺序相反，填答案时记得倒置一下顺序
-# print(means_2.predict())  # 使用训练后的对象预测新样本的标签
+# m1, m2 = np.array([-1, 3]), np.array([5, 1])
+# m1_list, m2_list = [m1], [m2]
+# kmeans(X, m1, m2, m1_list, m2_list)
 
-# Tutorial10 Q6 Agglomerative Clustering
-# X = np.array([[-1, 3],
-#              [1, 2],
-#              [0, 1],
-#              [4, 0],
-#              [5, 4],
-#              [3, 2]])
+
+# Tutorial10 Q6 Hierarchical Agglomerative Clustering
+# X = np.array([[1, 0],
+#              [0, 2],
+#              [1, 3],
+#              [3, 0],
+#              [3, 1]])
 
 # n_clusters: target number of clusters; linkage: ward, single, average, complete
-# clustering = AgglomerativeClustering(n_clusters=3, linkage='single').fit(X)
+# clustering = AgglomerativeClustering(n_clusters=2, linkage='single').fit(X)
 # print("The assigned labels of these samples are:", clustering.labels_)
 
 # Tutorial10 Q2 PCA
 # a., b.
-# X = np.array([[4, 2, 2],
-#              [0, -2, 2],
-#              [2, 4, 2],
-#              [-2, 0, 2]])
+# X = np.array([[-4.6, -3],
+#              [-2.6, 0],
+#              [-0.6, -1],
+#              [2.4, 2],
+#              [5.4, 2]])
 # pca_2d = PCA(n_components=2)
 # X_2d = pca_2d.fit_transform(X)
 # pca_1d = PCA(n_components=1)
@@ -885,16 +918,18 @@ x_norm = x - avg
 
 # Tutorial10 Q3 Competitive learning (without normalisation)
 # a. Find the cluster centres for each iteration
-# X = np.array([[-1.0, 3.0],
-#              [1.0, 4.0],
-#              [0.0, 5.0],
-#              [4.0, -1.0],
+# X = np.array([[1.0, 0.0],
+#              [0.0, 2.0],
+#              [1.0, 3.0],
 #              [3.0, 0.0],
-#              [5.0, 1.0]])
-# m1, m2, m3 = X[0] / 2, X[2] / 2, X[4] / 2
+#              [3.0, 1.0]])
+# m1, m2 = np.array([1.0, 1.0]), np.array([2.0, 2.0])  # initial cluster centres
+# m = [m1, m2]
+# m1, m2, m3 = X[0] / 2, X[2] / 2, X[4] / 2  # initial cluster centres
 # m = [m1, m2, m3]
-# lr = 0.1
-# samples = np.array([X[2], X[0], X[0], X[4], X[5]])
+# lr = 0.5
+# samples = np.array([X[2], X[0], X[0], X[4], X[5]])  # training samples
+# samples = X.copy()  # training samples
 # for i in range(len(samples)):
 #    dist = []
 #    for j in range(len(m)):
@@ -970,8 +1005,8 @@ x_norm = x - avg
 #    print("Iteration {0}: m1 = {1}, m2 = {2}".format(current_iter+1, m1_list[current_iter], m2_list[current_iter]))
 
     # terminate when both coordinates of both clusters centres change by less than 0.5
-#    if (m1_list[current_iter] - m1_list[current_iter - 1])[0] < 0.5 and (m1_list[current_iter] - m1_list[current_iter - 1])[1] < 0.5:
-#        if (m2_list[current_iter] - m2_list[current_iter - 1])[0] < 0.5 and (m2_list[current_iter] - m2_list[current_iter - 1])[1] < 0.5:
+#    if (m1_list[current_iter] - m1_list[current_iter - 1] < 0.5).all():
+#        if (m2_list[current_iter] - m2_list[current_iter - 1] < 0.5).all():
 #            print("After {0} iterations, the algorithm converges.".format(current_iter+1))
 #            print("m1 = {0}, m2 = {1}".format(m1_list[current_iter], m2_list[current_iter]))
 #            break
