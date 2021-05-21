@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
 
 
-# Tutorial 2.1 dichotomizer linear discriminant function
+# Tutorial 2.1 linear discriminant dichotomizer
 # def linear_discriminant(w, x, w0):
 #    g = np.dot(w, x) + w0
 #    return g
@@ -25,7 +25,7 @@ from sklearn.decomposition import PCA
 #    print("The class of this vector is 2.")
 
 
-# Tutorial 2.2, 2.5 augmented dichotomizer linear discriminant function
+# Tutorial 2.2, 2.5 augmented linear discriminant dichotomizer
 # def aug_linear_discriminant(a, x):
 #    y = np.insert(x, 0, 1)
 #    g = np.dot(a, y)
@@ -42,7 +42,7 @@ from sklearn.decomposition import PCA
 #    print("The class of this vector is {}.".format(2))
 
 
-# Tutorial 2.3 3D quadratic discriminant
+# Tutorial 2.3 3-dimensional quadratic discriminant dichotomizer
 # def quadratic_discriminant_3d(x):
 #    g = x[0] ** 2 - x[2] ** 2 + 2 * x[1] * x[2] + 4 * x[0] * x[1] + 3 * x[0] - 2 * x[1] + 2
 #    return g
@@ -56,7 +56,7 @@ from sklearn.decomposition import PCA
 #    print("The class of this vector is {}.".format(2))
 
 
-# Tutorial 2.4 2D quadratic discriminant
+# Tutorial 2.4 2-dimensional quadratic discriminant dichotomizer
 # def quadratic_discriminant_2d(a, b, c, x):
 #    g = np.dot(np.dot(x, a), x.T) + np.dot(x, b.T) + c
 #    return g
@@ -74,8 +74,6 @@ from sklearn.decomposition import PCA
 
 
 # Tutorial 2.6 batch perceptron
-# 没有sample normalisation, y的第一位都是1;
-# 如果有normalisation, 则第二类实例的y的第一位是-1并且x乘以-1, a的更新条件也发生变化
 # def batch_perceptron_with_sample_normalisation(a, lr, y):
 #    while True:
 #        mis_class = []
@@ -123,6 +121,10 @@ from sklearn.decomposition import PCA
 
 # a = np.array([-25, 6, 3])
 # lr = 1
+
+# 没有sample normalisation, 将x的第一位插入1得到y;
+# 如果有, 则第二类实例的y的第一位是-1并且x乘以-1, a的更新条件也发生变化
+
 # y = np.array([[1, 1, 5],
 #              [1, 2, 5],
 #              [-1, -4, -1],
@@ -134,8 +136,6 @@ from sklearn.decomposition import PCA
 
 
 # Tutorial 2.7, 2.9, 2.10 sequential perceptron
-# 没有sample normalisation, y的第一位都是1;
-# 如果有normalisation, 则第二类实例的y的第一位是-1且x乘以-1, 并且a的更新条件和更新等式都发生变化
 # def sequential_perceptron(a, lr, yk, labels):
 #    while True:
 #        pred_label = []
@@ -170,6 +170,10 @@ from sklearn.decomposition import PCA
 # if __name__ == '__main__':
 #    a_t = np.array([-25, 5, 2])
 #    rate = 1
+
+#    没有sample normalisation, y的第一位都是1;
+#    如果有, 则第二类实例的y的第一位是-1且x乘以-1, 并且a的更新条件和更新等式都发生变化
+
 #    data_set = np.array([[1, 5, 1],
 #                         [1, 5, -1],
 #                         [1, 7, 0],
@@ -321,7 +325,7 @@ from sklearn.decomposition import PCA
 #        print("i = {0}, the activation of the output neurons: {1}".format(i+1, y))
 
 
-# Tutorial 3.9 negative feedback network (more stable method)
+# Tutorial 3.9 negative feedback network more stable method
 # def negative_feedback_stable(x, w1, w2, n, e1, e2):
 #    y = np.array([0, 0])  # assuming activations are initialised to be all 0
 #    for i in range(0, n):
@@ -378,7 +382,7 @@ from sklearn.decomposition import PCA
 # print("Total number of weights:", total_connection_weights(n_in, n_out, hid, num_hidden, Bias))
 
 
-# Tutorial 4.4 represent patterns
+# Tutorial 4.4 classify patterns
 # def represent_patterns(w1, w2, w3, w4, x):
 #    temp_y = np.dot(w1, x) + w2
 #    y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
@@ -425,13 +429,12 @@ from sklearn.decomposition import PCA
 # print("m10 = {0}, w21 = {1}".format(m10, w21))
 
 
-# Tutorial 4.6 radial basis function RBF
+# Tutorial 4.6 radial basis function RBF two inputs two hidden units single output
 # Q.b
-# c1 = np.array([-1, -1])
-# c2 = np.array([1, 1])
+# c1, c2 = np.array([0, 0]), np.array([1, 1])  # centres
 # c = abs(c1 - c2)
 # n_H = 2  # the number of hidden units
-# x = np.array([1, -1])
+# x = np.array([0, 0])
 # sd = np.linalg.norm(c) / math.sqrt(2 * n_H)
 # d1 = abs(x - c1)
 # y1 = pow(math.e, -pow(np.linalg.norm(d1), 2) / (2 * pow(sd, 2)))
@@ -440,7 +443,7 @@ from sklearn.decomposition import PCA
 # print("y1 = {0}, y2 = {1}".format(y1, y2))
 
 # Q.c least squares method
-# 代入不同的x, 分别计算出y1和y2; fai_x的第一列是y1, 第二列是y2, 第三列全1
+# 代入不同的x, 分别计算出y1和y2; fai_x的第一列是y1, 第二列是y2, 第三列是1 (bias)
 # fai_x = np.array([[1.0, 0.1353, 1], [0.3679, 0.3679, 1], [0.3679, 0.3679, 1], [0.1353, 1.0, 1]])
 # t = np.array([0, 1, 1, 0])
 # temp1 = np.dot(fai_x.T, t)
@@ -449,27 +452,25 @@ from sklearn.decomposition import PCA
 # print("The output weights using the least squares method is:", W)
 
 # Q.d determine classes
-# W = [-2.50312891, -2.50312891, 2.84180225]  # 用c中计算出的权重值W
+# W = [-2.50312891, -2.50312891, 2.84180225]  # 用Q.c中计算出的权重值W
 # z = []
 # Class = []
 # for i in range(len(fai_x)):
 #    z.append(W[0] * fai_x[i][0] + W[1] * fai_x[i][1] + W[2])
+# print("The outputs at the output units:\n", z)
 # for i in range(len(z)):
 #    if z[i] > 0.5:
-#        Class.append(1)
+#        Class.append('1')
 #    else:
-#        Class.append(0)
-# for i in range(len(Class)):
-#    print(Class[i], end=' ')
+#        Class.append('0')
+# print("The classes for the input patterns are:", ' '.join(Class))
 
 
 # Tutorial 4.7
 # Q.a
 # The answer is located at Jupyter Notebook
 
-# Q.c, Q.d, Q.e
-# Q.d 受小数位精度影响，输出结果的小数位和答案的小数位不同
-# Q.e 输出结果与答案不同，应该是答案的问题
+# Q.c, Q.d, Q.e RBF single input three hidden units single output
 # c1, c2, c3 = 0.2, 0.6, 0.9
 # sd = 0.1
 # x = [0.05, 0.2, 0.25, 0.3, 0.4, 0.43, 0.48, 0.6, 0.7, 0.8, 0.9, 0.95]
