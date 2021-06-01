@@ -716,25 +716,29 @@ from sklearn.decomposition import PCA
 
 
 # Tutorial 7.4, 7.6 Karhunen-Loeve Transform KLT
-# x = np.array([[1, 2, 1],
-#              [2, 3, 1],
-#              [3, 5, 1],
-#              [2, 2, 1]])
+# x = np.array([[0, 1],
+#              [3, 5],
+#              [5, 4],
+#              [5, 6],
+#              [8, 7],
+#              [9, 7]])
 # num_samples, num_features = x.shape
 # avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
 # x_norm = x - avg  # zero-mean
 # print("The equivalent zero-mean data is:\n", x_norm)
-# cov_matrix = np.dot(np.transpose(x_norm), x_norm)
+# cov_matrix = np.dot(np.transpose(x_norm), x_norm) / len(x)
+# print("The covariance matrix is:\n", cov_matrix)
 # eig_val, eig_vec = np.linalg.eig(cov_matrix)
+# print("The eigenvectors and eigenvalues are:\n", eig_vec, '\n', '\n', eig_val)
 # eig_pairs = [(np.abs(eig_val[i]), eig_vec[:, i]) for i in range(num_features)]
 # eig_pairs.sort(reverse=True)
 
 # select the top k eigenvectors
-# k = 2  # project onto the first self-defined number of principal components
+# k = 1  # project onto the first self-defined number of principal components
 # feature = np.array([ele[1] for ele in eig_pairs[:k]])
 # get transformed data
 # data = np.dot(x_norm, np.transpose(feature))
-# print(data)  # either or both columns can be multiplied by -1
+# print("The new data is:\n", data)  # either or both columns can be multiplied by -1
 
 
 # Tutorial 7.7 Oja's learning rule
