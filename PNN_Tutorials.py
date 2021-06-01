@@ -168,19 +168,18 @@ from sklearn.decomposition import PCA
 
 
 # if __name__ == '__main__':
-#    a_t = np.array([-25, 5, 2])
+#    a_t = np.array([-1.5, 5, -1])
 #    rate = 1
 
 #    没有sample normalisation, y的第一位都是1;
 #    如果有, 则第二类实例的y的第一位是-1且x乘以-1, 并且a的更新条件和更新等式都发生变化
 
-#    data_set = np.array([[1, 5, 1],
-#                         [1, 5, -1],
-#                         [1, 7, 0],
-#                         [1, 3, 0],
+#    data_set = np.array([[1, 0, 0],
+#                         [1, 1, 0],
 #                         [1, 2, 1],
-#                         [1, 1, -1]])
-#    label = [1, 1, 1, -1, -1, -1]
+#                         [1, 0, 1],
+#                         [1, 1, 2]])
+#    label = [1, 1, 1, -1, -1]  # true class (target output)
 #    a_final = sequential_perceptron(a_t, rate, data_set, label)
 #    a_final = sequential_perceptron_with_sample_normalisation(a_t, rate, data_set)
 #    print("The value of a after learning is:", a_final)
@@ -305,13 +304,13 @@ from sklearn.decomposition import PCA
 #            break
 
 
-# theta = -2
-# w1 = 0.5
-# w2 = 1
+# theta = 1.5
+# w1 = 5
+# w2 = -1
 # rate = 1
 # W = np.array([-theta, w1, w2])
-# T = [1, 1, 0, 0, 0]  # y (target output)
-# X = np.array([[0, 2], [2, 1], [-3, 1], [-2, -1], [0, -1]])  # 直接输入x的值
+# T = [1, 1, 1, 0, 0]  # class y (target output)
+# X = np.array([[0, 0], [1, 0], [2, 1], [0, 1], [1, 2]])  # 直接输入x的值
 # sequential_delta(W, rate, T, X)
 # batch_delta(W, rate, T, X)
 
@@ -376,18 +375,18 @@ from sklearn.decomposition import PCA
 
 # n_in = 2
 # n_out = 3
-# hid = [4, 5]
-# num_hidden = 2
+# hid = [4, 5]  # the number of hidden units
+# num_hidden = 2  # the number of hidden layers
 # Bias = True  # with biases, True; otherwise, False
 # print("Total number of weights:", total_connection_weights(n_in, n_out, hid, num_hidden, Bias))
 
 
-# Tutorial 4.4 classify patterns
+# Tutorial 4.4 neural network classify patterns
 # def represent_patterns(w1, w2, w3, w4, x):
 #    temp_y = np.dot(w1, x) + w2
-#    y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
+#    y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1  # symmetric sigmoid
 #    temp_z = np.dot(w3, y) + w4
-#    z = 1 / (1 + 1 / (pow(math.e, temp_z)))
+#    z = 1 / (1 + 1 / (pow(math.e, temp_z)))  # logarithmic sigmoid
 #    print("y = {0}, z = {1}".format(y, z))
 #    print("This pattern is represented by", [round(i) for i in z])
 
@@ -398,19 +397,19 @@ from sklearn.decomposition import PCA
 # W2 = np.array([4.8432, 0.3973, 2.1761])  # W_j0
 # W3 = np.array([[-1.1444, 0.3115, -9.9812], [0.0106, 11.5477, 2.6479]])  # W_kj
 # W4 = np.array([2.5230, 2.6463])  # W_k0
-# X = np.array([1, 1, 0, 0])  # pattern
+# X = np.array([0, 1, 0, 1])  # pattern
 # represent_patterns(W1, W2, W3, W4, X)
 
 
 # Tutorial 4.5 neural network
 # Q.a
-# w = np.array([[0.5, 0], [0.3, -0.7]])  # from left to right, w11, w12; w21, w22
-# w0 = np.array([0.2, 0])  # from left to right, w10, w20
+# w = np.array([[0.5, 0], [0.3, -0.7]])  # w11, w12; w21, w22
+# w0 = np.array([0.2, 0])  # w10, w20
 # x = np.array([0.1, 0.9])
 # temp_y = np.dot(w, x.T) + w0
-# y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1
+# y = 2 / (1 + 1 / pow(math.e, 2 * temp_y)) - 1  # symmetric sigmoid
 # temp_z = 0.8 * y[0] + 1.6 * y[1] - 0.4
-# z = 2 / (1 + 1 / pow(math.e, 2 * temp_z)) - 1
+# z = 2 / (1 + 1 / pow(math.e, 2 * temp_z)) - 1  # symmetric sigmoid
 # print("y = {0}, z = {1}".format(y, z))
 
 # Q.c
@@ -429,17 +428,17 @@ from sklearn.decomposition import PCA
 # print("m10 = {0}, w21 = {1}".format(m10, w21))
 
 
-# Tutorial 4.6 radial basis function RBF two inputs two hidden units single output
+# Tutorial 4.6 radial basis function RBF
 # Q.b
 # c1, c2 = np.array([0, 0]), np.array([1, 1])  # centres
 # c = abs(c1 - c2)
 # n_H = 2  # the number of hidden units
-# x = np.array([0, 0])
+# x = np.array([0, 0])  # two inputs
 # sd = np.linalg.norm(c) / math.sqrt(2 * n_H)
 # d1 = abs(x - c1)
-# y1 = pow(math.e, -pow(np.linalg.norm(d1), 2) / (2 * pow(sd, 2)))
+# y1 = pow(math.e, -pow(np.linalg.norm(d1), 2) / (2 * pow(sd, 2)))  # Gaussian function
 # d2 = abs(x - c2)
-# y2 = pow(math.e, -pow(np.linalg.norm(d2), 2) / (2 * pow(sd, 2)))
+# y2 = pow(math.e, -pow(np.linalg.norm(d2), 2) / (2 * pow(sd, 2)))  # Gaussian function
 # print("y1 = {0}, y2 = {1}".format(y1, y2))
 
 # Q.c least squares method
@@ -470,10 +469,10 @@ from sklearn.decomposition import PCA
 # Q.a
 # The answer is located at Jupyter Notebook
 
-# Q.c, Q.d, Q.e RBF single input three hidden units single output
+# Q.c, Q.d, Q.e RBF
 # c1, c2, c3 = 0.2, 0.6, 0.9
 # sd = 0.1
-# x = [0.05, 0.2, 0.25, 0.3, 0.4, 0.43, 0.48, 0.6, 0.7, 0.8, 0.9, 0.95]
+# x = [0.05, 0.2, 0.25, 0.3, 0.4, 0.43, 0.48, 0.6, 0.7, 0.8, 0.9, 0.95]  # single input
 # t = np.array([0.0863, 0.2662, 0.2362, 0.1687, 0.1260, 0.1756, 0.3290, 0.6694, 0.4573, 0.3320, 0.4063, 0.3535])
 # c1 = (x[0] + x[1] + x[2]) / 3
 # c2 = (x[3] + x[4]) / 2
@@ -684,7 +683,7 @@ from sklearn.decomposition import PCA
 #    0.5 * math.log(1 - pow(1 + pow(math.e, -(theta_d1 * x_2[0] - theta_d2 * x_2[1] - 2)), -1), math.e)
 
 # V_D_G = E1 + E2
-# print("The value of V(D, G) is:", V_D_G)
+# print("The cost V(D, G) is:", V_D_G)
 
 # b. determine the updated theta values
 # lr = 0.02
@@ -716,23 +715,22 @@ from sklearn.decomposition import PCA
 # print("The updated theta value is:\n", updated_theta)
 
 
-# Tutorial 7.4, 7.6 Karhunen-Loeve Transform
-# x = np.array([[1, 2],
-#              [3, 5],
-#              [5, 4],
-#              [8, 7],
-#              [11, 7]])
+# Tutorial 7.4, 7.6 Karhunen-Loeve Transform KLT
+# x = np.array([[1, 2, 1],
+#              [2, 3, 1],
+#              [3, 5, 1],
+#              [2, 2, 1]])
 # num_samples, num_features = x.shape
 # avg = np.array([np.mean(x[:, i]) for i in range(num_features)])
 # x_norm = x - avg  # zero-mean
-# print("The equivalent zero-mean data is:", x_norm)
+# print("The equivalent zero-mean data is:\n", x_norm)
 # cov_matrix = np.dot(np.transpose(x_norm), x_norm)
 # eig_val, eig_vec = np.linalg.eig(cov_matrix)
 # eig_pairs = [(np.abs(eig_val[i]), eig_vec[:, i]) for i in range(num_features)]
 # eig_pairs.sort(reverse=True)
 
 # select the top k eigenvectors
-# k = 1  # project onto the first self-defined number of principal components
+# k = 2  # project onto the first self-defined number of principal components
 # feature = np.array([ele[1] for ele in eig_pairs[:k]])
 # get transformed data
 # data = np.dot(x_norm, np.transpose(feature))
@@ -839,6 +837,12 @@ from sklearn.decomposition import PCA
 # print("The reconstruction errors for these two alternatives are:", error1, error2)  # 选较小的值
 # print("The costs for these two alternatives are:", cost1, cost2)  # 选较小的值
 
+# Feature Extraction
+# w = np.array([5, -3])
+# X = np.array([[0, 0], [1, 0], [2, 1], [0, 1], [1, 2]])
+# Y = np.dot(w, X.T)
+# print("The coordinates in the new feature space are:", Y)
+
 
 # Tutorial10 Q1 K-Means Clustering
 # def kmeans(x, m1, m2, m1_list, m2_list):
@@ -873,25 +877,26 @@ from sklearn.decomposition import PCA
 
 
 # X = np.array([[-1, 3],
-#              [1, 4],
-#              [0, 5],
-#              [4, -1],
-#              [3, 0],
-#              [5, 1]])
-# m1, m2 = np.array([-1, 3]), np.array([5, 1])
+#              [1, 2],
+#              [0, 1],
+#              [4, 0],
+#              [5, 4],
+#              [3, 2]])
+# m1, m2 = np.array([-1, 3]), np.array([3, 2])
 # m1_list, m2_list = [m1], [m2]
 # kmeans(X, m1, m2, m1_list, m2_list)
 
 
-# Tutorial10 Q6 Hierarchical Agglomerative Clustering
-# X = np.array([[1, 0],
-#              [0, 2],
-#              [1, 3],
-#              [3, 0],
-#              [3, 1]])
+# Tutorial10 Q6 Agglomerative Hierarchical Clustering
+# X = np.array([[-1, 3],
+#              [1, 2],
+#              [0, 1],
+#              [4, 0],
+#              [5, 4],
+#              [3, 2]])
 
 # n_clusters: target number of clusters; linkage: ward, single, average, complete
-# clustering = AgglomerativeClustering(n_clusters=2, linkage='single').fit(X)
+# clustering = AgglomerativeClustering(n_clusters=3, linkage='average').fit(X)
 # print("The assigned labels of these samples are:", clustering.labels_)
 
 # Tutorial10 Q2 PCA
@@ -982,11 +987,11 @@ from sklearn.decomposition import PCA
 
 # Tutorial Q5 Fuzzy K-means algorithm
 # X = np.array([[-1.0, 3.0],
-#              [1.0, 4.0],
-#              [0.0, 5.0],
-#              [4.0, -1.0],
-#              [3.0, 0.0],
-#              [5.0, 1.0]])
+#              [1.0, 2.0],
+#              [0.0, 1.0],
+#              [4.0, 0.0],
+#              [5.0, 4.0],
+#              [3.0, 2.0]])
 # b = 2
 # u = np.array([[1, 0.5, 0.5, 0.5, 0.5, 0], [0, 0.5, 0.5, 0.5, 0.5, 1]])
 # m1 = sum([(u[0][i] ** 2) * X[i] for i in range(len(X))]) / (sum([u[0][i] ** 2 for i in range(len(X))]))
