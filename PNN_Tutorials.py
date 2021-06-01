@@ -6,6 +6,7 @@ from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
+from sklearn.svm import SVC
 
 
 # Tutorial 2.1 linear discriminant dichotomizer
@@ -848,7 +849,31 @@ from sklearn.decomposition import PCA
 # print("The coordinates in the new feature space are:", Y)
 
 
-# Tutorial10 Q1 K-Means Clustering
+# Tutorial 8 SVM
+# def svm(x, y):
+#    clf = SVC(kernel='linear')
+#    clf.fit(x, y)
+#    print("w and w0 of the SVM classifier is:", clf.coef_, clf.intercept_)
+#    print("The support vectors are:\n", clf.support_vectors_)  # 支持向量不一定对，自己画图验证一下
+#    margin = 2 / np.linalg.norm(clf.coef_)
+#    print("The margin given by the hyperplane is:", margin)
+
+
+# feature mapping function
+# X = np.array([[2, 2], [2, -2], [-2, -2], [-2, 2], [1, 1], [1, -1], [-1, -1], [-1, 1]])
+# Y = np.array([1, 1, 1, 1, -1, -1, -1, -1])
+# for data in X:
+#    if np.linalg.norm(data) > 2:
+#        temp = data[0].copy()
+#        data[0] = 4 - (data[1] / 2) + abs(data[0] - data[1])
+#        data[1] = 4 - (temp / 2) + abs(temp - data[1])
+#    else:
+#        data[0] -= 2
+#        data[1] -= 3
+
+# svm(X, Y)
+
+# Tutorial 10 Q1 K-Means Clustering
 # def kmeans(x, m1, m2, m1_list, m2_list):
 #    while True:
 #        Class = []
@@ -891,7 +916,7 @@ from sklearn.decomposition import PCA
 # kmeans(X, m1, m2, m1_list, m2_list)
 
 
-# Tutorial10 Q6 Agglomerative Hierarchical Clustering
+# Tutorial 10 Q6 Agglomerative Hierarchical Clustering
 # X = np.array([[-1, 3],
 #              [1, 2],
 #              [0, 1],
@@ -903,7 +928,7 @@ from sklearn.decomposition import PCA
 # clustering = AgglomerativeClustering(n_clusters=3, linkage='average').fit(X)
 # print("The assigned labels of these samples are:", clustering.labels_)
 
-# Tutorial10 Q2 PCA
+# Tutorial 10 Q2 PCA
 # a., b.
 # X = np.array([[-4.6, -3],
 #              [-2.6, 0],
@@ -926,7 +951,7 @@ from sklearn.decomposition import PCA
 # print("The assigned labels of the transformed 1D samples are:", means_1d.labels_)
 # print("The new data based on the transformed 1D samples belong to:", means_1d.predict(new_data_1d))
 
-# Tutorial10 Q3 Competitive learning (without normalisation)
+# Tutorial 10 Q3 Competitive learning (without normalisation)
 # a. Find the cluster centres for each iteration
 # X = np.array([[1.0, 0.0],
 #              [0.0, 2.0],
@@ -968,7 +993,7 @@ from sklearn.decomposition import PCA
 # classify(X, m)
 
 
-# Tutorial10 Q4 Basic leader follower algorithm (without normalisation)
+# Tutorial 10 Q4 Basic leader follower algorithm (without normalisation)
 # a. Find the cluster centres for each iteration
 # m = []
 # theta = 3
@@ -989,7 +1014,7 @@ from sklearn.decomposition import PCA
 # classify(X, m)
 
 
-# Tutorial Q5 Fuzzy K-means algorithm
+# Tutorial 10 Q5 Fuzzy K-means algorithm
 # X = np.array([[-1.0, 3.0],
 #              [1.0, 2.0],
 #              [0.0, 1.0],
