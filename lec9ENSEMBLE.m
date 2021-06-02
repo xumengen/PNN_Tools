@@ -34,7 +34,7 @@ for epo = 1 : epoch
     fprintf('一波西龙ε = %f, 阿尔法α = %f\n', e1, aerfa); 
     fprintf('未归一化权重：\n'); disp(w_e_ayh);
     fprintf('归一化权重：\n'); disp(w_new);
-    fprintf('classifier分类器为：\n'); disp(vpa(classifier));
+    fprintf('classifier分类器为：\n'); disp(vpa(classifier));  % ensemble classifier is sgn(...)
     
     
 end
